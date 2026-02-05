@@ -32,7 +32,7 @@ class Chat:
     def newSession(self) -> None:
         self.currentSession = []
     
-    def sendMessages(self, message:str, GPT4=False) -> str:
+    def sendMessages(self, message:str, GPT4=False) -> tuple:
 
         # logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         # logger.info(f"Sending message: \n{message}")
@@ -88,6 +88,9 @@ class Chat:
         #     # temperature = 0.3
         # )
 
+        prompt_tokens = len(encoder.encode(SYSTEM_MESSAGE)) + len(encoder.encode(message))
+        completion_tokens = len(encoder.encode(response['choices'][0]['message']['content']))
+
         if GPT4:
             global tokens_sent_gpt4
             global tokens_received_gpt4
@@ -108,7 +111,7 @@ class Chat:
         console.print(rich_utils.make_response_panel(response['choices'][0]['message']['content'], "Response"))
         
 
-        return response['choices'][0]['message']['content']
+        return response['choices'][0]['message']['content'], prompt_tokens, completion_tokens
     
     def makeYesOrNoQuestion(self, question:str)->str:
         prompt = f"{question}. Please answer in one word, yes or no."

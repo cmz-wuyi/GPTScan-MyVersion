@@ -15,6 +15,7 @@ import json
 import re
 import rich
 import rich_utils
+import chatgpt_api # 新增这一行，以便访问全局变量
 logger = logging.getLogger(__name__)
 console = rich.get_console()
 
@@ -31,11 +32,25 @@ def ask_with_timeout(prompt, gpt4=False, timeout=90):
             pool.terminate()
             raise TimeoutError("Timeout")
         if process.ready() == True:
-            res = process.get()
+            # 【修改开始】：接收元组并更新主进程的全局变量
+            res_tuple = process.get()
+
+            # 解包返回值
+            content, p_tokens, c_tokens = res_tuple
+
+            # 在主进程中手动更新计数器
+            if gpt4:
+                chatgpt_api.tokens_sent_gpt4.value += p_tokens
+                chatgpt_api.tokens_received_gpt4.value += c_tokens
+            else:
+                chatgpt_api.tokens_sent.value += p_tokens
+                chatgpt_api.tokens_received.value += c_tokens
+
             # logger.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-            # logger.info(f"Received message: \n{res}")
+            # logger.info(f"Received message: \n{content}")
             # logger.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-            return res
+            return content  # 只返回内容，保持与其他代码的兼容性
+            # 【修改结束】
 
 
 def ask_for_function_to_focus_with_feature_words_v2(source_dir: str, feature_words: List[List[str]]) -> Tuple[CallGraph, Dict[str, Dict[str, List[int]]]]:
