@@ -1,5 +1,6 @@
 import openai
 import openai.error
+openai.api_base = "https://api.chatanywhere.org/v1"
 from typing import List, Dict
 from config import OPENAI_APIS, GPT4_API
 import logging
@@ -16,7 +17,7 @@ console = rich.get_console()
 SYSTEM_MESSAGE = "You are a smart contract auditor. You will be asked questions related to code properties. You can mimic answering them in the background five times and provide me with the most frequently appearing answer. Furthermore, please strictly adhere to the output format specified in the question; there is no need to explain your answer."
 
 encoder = tiktoken.get_encoding("cl100k_base")
-encoder = tiktoken.encoding_for_model("gpt-3.5-turbo")
+encoder = tiktoken.encoding_for_model("gpt-3.5-turbo-ca")
 
 tokens_sent = Value("d", 0)
 tokens_received = Value("d", 0)
@@ -54,7 +55,7 @@ class Chat:
                     )
                 else:
                     response = openai.ChatCompletion.create(
-                        model="gpt-3.5-turbo",
+                        model="gpt-3.5-turbo-ca",
                         # model="gpt-3.5-turbo-0613",
                         # model="gpt-3.5-turbo",
                         # model="gpt-4",

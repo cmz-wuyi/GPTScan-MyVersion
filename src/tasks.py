@@ -142,7 +142,7 @@ def simple_cli():
     final_result = {}
     # logger.info(res)
     for file in res:
-        with open(file) as f:
+        with open(file, encoding='utf-8') as f:
             source = f.read().splitlines()
             for contract in res[file]:
                 for function1 in res[file][contract]:
@@ -162,7 +162,7 @@ def simple_cli():
                                 # if function1 is not asked yet, ask for function1 first
                                 if vul["name"] not in function1_tmp_result:
                                     function1_detail = cg.get_function_detail(file, contract, function1)
-                                    function1_text = "\n".join(open(file).read().splitlines()[int(function1_detail['loc']['start'].split(":")[0])-1:int(function1_detail['loc']['end'].split(":")[0])])
+                                    function1_text = "\n".join(open(file, encoding='utf-8').read().splitlines()[int(function1_detail['loc']['start'].split(":")[0])-1:int(function1_detail['loc']['end'].split(":")[0])])
                                     try:
                                         args = []
                                         checker = vul["static"]["rule"]["name"]
@@ -259,7 +259,7 @@ def simple_cli():
                                         function2_contract = function2_splitted[1]
                                         function2_func = function2_splitted[2]
                                         function2_detail = cg.get_function_detail(function2_file, function2_contract, function2_func)
-                                        function2_text = "\n".join(open(function2_file).read().splitlines()[int(function2_detail['loc']['start'].split(":")[0])-1:int(function2_detail['loc']['end'].split(":")[0])])
+                                        function2_text = "\n".join(open(function2_file, encoding='utf-8').read().splitlines()[int(function2_detail['loc']['start'].split(":")[0])-1:int(function2_detail['loc']['end'].split(":")[0])])
                                         if "multisteps" in vul["static"] and vul["static"]["multisteps"] == True:
                                             answer = analyze_pipeline.ask_for_static_multistep(vul["static"]["prompt"], function2_text, vul["static"]["output_keys"])
                                         else:

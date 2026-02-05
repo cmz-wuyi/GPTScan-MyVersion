@@ -217,7 +217,7 @@ def convert_output(origin_output:Dict, scan_rules:List[Dict], cg:CallGraph, base
     for result in res["results"]:
         afftected_table = Table("File Path", "Line Range", "Code")
         for affectedFile in result["affectedFiles"]:
-            afftected_table.add_row(affectedFile["filePath"], f"{affectedFile['range']['start']['line']} - {affectedFile['range']['end']['line']}", "\n".join(open(affectedFile["filePath"]).readlines()[affectedFile['range']['start']['line']-1:affectedFile['range']['end']['line']]))
+            afftected_table.add_row(affectedFile["filePath"], f"{affectedFile['range']['start']['line']} - {affectedFile['range']['end']['line']}", "\n".join(open(affectedFile["filePath"], encoding="utf-8").readlines()[affectedFile['range']['start']['line']-1:affectedFile['range']['end']['line']]))
         table.add_row(result["title"].split(":")[1].strip(), result["description"], afftected_table)
     console.print(table)
     return res

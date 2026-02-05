@@ -154,7 +154,7 @@ class CallGraph:
             for contract_data in file_data["subcontracts"]:
                 self_file_to_remove_functions[file][contract_data["name"]] = []
                 for function_data in contract_data["functions"]:
-                    function_content = "\n".join(open(file).read().splitlines()[int(function_data["loc"]["start"].split(":")[0])-1:int(function_data["loc"]["end"].split(":")[0])])
+                    function_content = "\n".join(open(file, encoding="utf-8", errors="ignore").read().splitlines()[int(function_data["loc"]["start"].split(":")[0])-1:int(function_data["loc"]["end"].split(":")[0])])
                     if function_data["kind"] != "function":
                         self_file_to_remove_functions[file][contract_data["name"]].append(function_data)
                         continue

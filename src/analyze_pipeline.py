@@ -104,7 +104,7 @@ def ask_whether_has_vul_with_scenario_v9(src_folder: str, rules: List[dict]) -> 
                 # ignore functions with only one line
                 if int(func["loc"]["start"].split(":")[0]) == int(func["loc"]["end"].split(":")[0]):
                     continue
-                func_text = "\n".join(open(file).read().splitlines()[int(
+                func_text = "\n".join(open(file, encoding="utf-8", errors="ignore").read().splitlines()[int(
                     func["loc"]["start"].split(":")[0])-1:int(func["loc"]["end"].split(":")[0])])
                 func_text_without_def = func_text[func_text.index("{")+1:func_text.rindex("}")]
                 file_func_question_map[file][contract["name"]
@@ -353,7 +353,7 @@ def ask_whether_has_vul_with_scenario_v9(src_folder: str, rules: List[dict]) -> 
 
                 functions_ = set()
                 for caller in callers:
-                    with open(caller[0]) as f:
+                    with open(caller[0], encoding='utf-8') as f:
                         detail = cg.get_function_detail(*caller)
                         if detail is None:
                             continue
@@ -364,7 +364,7 @@ def ask_whether_has_vul_with_scenario_v9(src_folder: str, rules: List[dict]) -> 
                 caller_code = {}
 
                 for function_file_pair in functions_:
-                    with open(function_file_pair[0]) as f:
+                    with open(function_file_pair[0], encoding='utf-8') as f:
                         source = f.read().splitlines()
                         detail = cg.get_function_detail(*function_file_pair)
                         if detail is None:
