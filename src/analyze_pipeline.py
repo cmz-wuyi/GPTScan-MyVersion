@@ -38,6 +38,7 @@ def ask_with_timeout(prompt, gpt4=False, timeout=90):
             # 解包返回值
             content, p_tokens, c_tokens = res_tuple
 
+
             # 在主进程中手动更新计数器
             if gpt4:
                 chatgpt_api.tokens_sent_gpt4.value += p_tokens

@@ -1,6 +1,6 @@
 import openai
 import openai.error
-openai.api_base = "https://api.chatanywhere.org/v1"
+openai.api_base = "https://api.chatanywhere.tech/v1"
 from typing import List, Dict
 from config import OPENAI_APIS, GPT4_API
 import logging
@@ -17,7 +17,7 @@ console = rich.get_console()
 SYSTEM_MESSAGE = "You are a smart contract auditor. You will be asked questions related to code properties. You can mimic answering them in the background five times and provide me with the most frequently appearing answer. Furthermore, please strictly adhere to the output format specified in the question; there is no need to explain your answer."
 
 encoder = tiktoken.get_encoding("cl100k_base")
-encoder = tiktoken.encoding_for_model("gpt-3.5-turbo-ca")
+encoder = tiktoken.encoding_for_model("gpt-3.5-turbo")
 
 tokens_sent = Value("d", 0)
 tokens_received = Value("d", 0)
@@ -55,7 +55,7 @@ class Chat:
                     )
                 else:
                     response = openai.ChatCompletion.create(
-                        model="gpt-3.5-turbo-ca",
+                        model="deepseek-v3.2",
                         # model="gpt-3.5-turbo-0613",
                         # model="gpt-3.5-turbo",
                         # model="gpt-4",
@@ -88,30 +88,40 @@ class Chat:
         #     # temperature = 0.3
         # )
 
-        prompt_tokens = len(encoder.encode(SYSTEM_MESSAGE)) + len(encoder.encode(message))
-        completion_tokens = len(encoder.encode(response['choices'][0]['message']['content']))
+        # prompt_tokens = len(encoder.encode(SYSTEM_MESSAGE)) + len(encoder.encode(message))
+        # completion_tokens = len(encoder.encode(response['choices'][0]['message']['content']))
+        real_prompt_tokens = response['usage']['prompt_tokens']
+        real_completion_tokens = response['usage']['completion_tokens']
 
         if GPT4:
-            global tokens_sent_gpt4
-            global tokens_received_gpt4
-
-            tokens_sent_gpt4.value += len(encoder.encode(SYSTEM_MESSAGE))
-            tokens_sent_gpt4.value += len(encoder.encode(message))
-            tokens_received_gpt4.value += len(encoder.encode(response['choices'][0]['message']['content']))
+            # global tokens_sent_gpt4
+            # global tokens_received_gpt4
+            #
+            # tokens_sent_gpt4.value += len(encoder.encode(SYSTEM_MESSAGE))
+            # tokens_sent_gpt4.value += len(encoder.encode(message))
+            # tokens_received_gpt4.value += len(encoder.encode(response['choices'][0]['message']['content']))
+            global tokens_sent_gpt4, tokens_received_gpt4
+            tokens_sent_gpt4.value += real_prompt_tokens
+            tokens_received_gpt4.value += real_completion_tokens
         else:
-            global tokens_sent
-            global tokens_received
-
-            tokens_sent.value += len(encoder.encode(SYSTEM_MESSAGE))
-            tokens_sent.value += len(encoder.encode(message))
-            tokens_received.value += len(encoder.encode(response['choices'][0]['message']['content']))
+            # global tokens_sent
+            # global tokens_received
+            #
+            # tokens_sent.value += len(encoder.encode(SYSTEM_MESSAGE))
+            # tokens_sent.value += len(encoder.encode(message))
+            # tokens_received.value += len(encoder.encode(response['choices'][0]['message']['content']))
+            global tokens_sent, tokens_received
+            tokens_sent.value += real_prompt_tokens
+            tokens_received.value += real_completion_tokens
 
         self.currentSession.append(response['choices'][0]['message'])
 
+        # console.print(rich_utils.make_response_panel(response['choices'][0]['message']['content'], "Response"))
         console.print(rich_utils.make_response_panel(response['choices'][0]['message']['content'], "Response"))
         
 
-        return response['choices'][0]['message']['content'], prompt_tokens, completion_tokens
+        # return response['choices'][0]['message']['content'], prompt_tokens, completion_tokens
+        return response['choices'][0]['message']['content'], real_prompt_tokens, real_completion_tokens
     
     def makeYesOrNoQuestion(self, question:str)->str:
         prompt = f"{question}. Please answer in one word, yes or no."
